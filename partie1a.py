@@ -21,7 +21,7 @@ def deplacer(grille, direction):
     if direction == "h":
         grille = haut(grille)
     elif direction == "b":
-        grille == bas(grille)
+        grille = bas(grille)
     elif direction == "g":
         grille = gauche(grille)
     elif direction == "d":
@@ -109,29 +109,51 @@ def haut(g):
     while i < n - 1:
         for j in range(n):  # on parcourt les colonnes
             x, y = i, j
-            while x < n - 1:  # déplacements
+            while x < n - 1:  # fusions
+                if g[x + 1][y] == g[x][y]:  # si deux éléments identiques
+                    g[x][y] *= 2  # alors on les fusionne
+                    g[x + 1][y] = 0
+                x += 1
+        i += 1
+    i = 0
+    while i < n - 1:
+        for j in range(n):
+            x, y = i, j
+            while x < n - 1:
                 if g[x][y] == 0 and g[x + 1][y] != 0:
-                    while x >= 0 and g[x][y] == 0:
+                    while i >= 0 and g[x][y] == 0:
                         g[x][y] = g[x + 1][y]
                         g[x + 1][y] = 0
                         x -= 1
                 x += 1
-        x, y = i, j
-        while i < n - 1:  # fusions une fois les déplacements faits
-            if g[i + 1][j] == g[i][j]:  # si deux éléments identiques
-                g[i][j] *= 2  # alors on les fusionne
-                g[i + 1][j] = 0
-                if g[x][y] == 0 and g[x][y + 1] != 0:
-                    while y >= 0 and g[x][y] == 0:
-                        g[x][y] = g[x][y + 1]
-                        g[x][y + 1] = 0
-                        x -= 1
-            i += 1
         i += 1
     return g
 
 
 def bas(g):
+    n = len(g)
+    i = n - 1
+    while i > 0:
+        for j in range(n):  # on parcourt les colonnes
+            x, y = i, j
+            while x > 0:  # fusions
+                if g[x - 1][y] == g[x][y]:  # si deux éléments identiques
+                    g[x][y] *= 2  # alors on les fusionne
+                    g[x - 1][y] = 0
+                x -= 1
+        i -= 1
+    i = n - 1
+    while i > 0:
+        for j in range(n):
+            x, y = i, j
+            while x > 0:
+                if g[x][y] == 0 and g[x - 1][y] != 0:
+                    while x < n and g[x][y] == 0:
+                        g[x][y] = g[x - 1][y]
+                        g[x - 1][y] = 0
+                        x += 1
+                x -= 1
+        i -= 1
     return g
 
 
@@ -140,28 +162,17 @@ def gauche(g):
     for i in range(n):  # on parcourt les lignes
         j = 0
         x, y = i, j
-        while y < n - 1:  # déplacements
-            if g[x][y] == 0 and g[x][y + 1] != 0:
-                # si la case actuelle est vide et la case suivante non-vide
-                while y >= 0 and g[x][y] == 0:
-                    # tant qu'on n'est pas au début de la ligne et
-                    # que la case actuelle est vide
-                    g[x][y] = g[x][y + 1]  # déplacement de cette case
-                    g[x][y + 1] = 0
-                    y -= 1
+        while y < n - 1:  # fusions
+            if g[x][y + 1] == g[x][y]:  # si deux éléments identiques
+                g[x][y] *= 2  # alors on les fusionne
+                g[x][y + 1] = 0
             y += 1
-        while j < n - 1:  # fusions une fois les premiers déplacements faits
-            if g[i][j + 1] == g[i][j]:  # si deux éléments identiques
-                g[i][j] *= 2  # alors on les fusionne
-                g[i][j + 1] = 0
-                x, y = i, j
-                while y < n - 1:  # déplacements
-                    if g[x][y] == 0 and g[x][y + 1] != 0:
-                        while y >= 0 and g[x][y] == 0:
-                            g[x][y] = g[x][y + 1]
-                            g[x][y + 1] = 0
-                            y -= 1
-                    y += 1
+        while j < n - 1:  # déplacements
+            if g[i][j] == 0 and g[i][j + 1] != 0:
+                while j >= 0 and g[i][j] == 0:
+                    g[i][j] = g[i][j + 1]
+                    g[i][j + 1] = 0
+                    j -= 1
             j += 1
     return g
 
@@ -171,25 +182,17 @@ def droite(g):
     for i in range(n):  # on parcourt les lignes
         j = n - 1
         x, y = i, j
-        while y > 0:  # déplacements
-            if g[x][y] == 0 and g[x][y - 1] != 0:
-                while y < n and g[x][y] == 0:
-                    g[x][y] = g[x][y - 1]
-                    g[x][y - 1] = 0
-                    y += 1
+        while y > 0:  # fusions une fois les déplacements faits
+            if g[x][y - 1] == g[x][y]:
+                g[x][y] *= 2
+                g[x][y - 1] = 0
             y -= 1
-        while j > 0:  # fusions une fois les déplacements faits
-            if g[i][j - 1] == g[i][j]:
-                g[i][j] *= 2
-                g[i][j - 1] = 0
-                x, y = i, j
-                while y > 0:  # déplacements
-                    if g[x][y] == 0 and g[x][y - 1] != 0:
-                        while y < n and g[x][y] == 0:
-                            g[x][y] = g[x][y - 1]
-                            g[x][y - 1] = 0
-                            y += 1
-                    y -= 1
+        while j > 0:  # déplacements
+            if g[i][j] == 0 and g[i][j - 1] != 0:
+                while j < n and g[i][j] == 0:
+                    g[i][j] = g[i][j - 1]
+                    g[i][j - 1] = 0
+                    j += 1
             j -= 1
     return g
 
