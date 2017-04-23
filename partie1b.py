@@ -9,10 +9,6 @@ jeu.title("Jeu 2048 - version L1 2017")
 
 def partie(n):
     g3 = init(n)
-    # g3 = [[2, 2, 4, 0],
-    #       [2, 4, 0, 4],
-    #       [4, 0, 2, 2],
-    #       [0, 4, 0, 2]]
     dessine_grille(g3)
     # Liaisons touche-fonction
     jeu.bind('<Up>',
@@ -259,7 +255,7 @@ def touche(event, g):
 # Widgets Tkinter #
 
 can = Canvas(jeu, height=400, width=400, bg="white")
-can.grid(row= 0, rowspan=3)
+can.grid(row=0, rowspan=3)
 
 bJouer = Button(jeu, text="Jouer", command=lambda: partie(4))
 bJouer.grid(row=0, column=1)

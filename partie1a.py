@@ -3,10 +3,6 @@ from random import choice, randrange
 
 def partie(n):
     g3 = init(n)
-    # g3 = [[2, 2, 4, 0],
-    #       [2, 4, 0, 4],
-    #       [4, 0, 2, 2],
-    #       [0, 4, 0, 2]]
     affiche(g3)
     while not gagnante(g3) and not pleine(g3):
         d = input("Direction : ")
@@ -191,66 +187,3 @@ def droite(g):
                     j += 1
             j -= 1
     return g
-
-
-g1 = [[2, 2, 2, 2], [4, 0, 2, 8], [0, 16, 32, 0], [128, 256, 1024, 2048]]
-g2 = [[2, 2, 2, 2], [4, 0, 2, 8], [0, 16, 32, 0], [128, 256, 16, 32]]
-
-print("Grille g1 :")
-affiche(g1)
-print("appartient(1024, g1) :", appartient(1024, g1))
-print("appartient(512, g1) :", appartient(512, g1))
-print("appartient(0, g1) :", appartient(0, g1))
-print("gagnante(g1) :", gagnante(g1))
-print("pleine(g1) :", pleine(g1))
-print("vides(g1) :", vides(g1))
-
-print("------------------------------------", '\n')
-
-print("Grille g2 :")
-affiche(g2)
-print("valeur_max(g2) :", valeur_max(g2))
-print("lst_cases(g2, 16) :", lst_cases(g2, 16))
-
-print("------------------------------------", '\n')
-
-
-partie(4)
-
-# def afficher(grille):
-#     res = ""
-#     i = 0
-#     while i < len(grille):
-#         j = 0
-#         while j < len(grille):
-#             if (j, 2) in positions(grille):
-#                 if len(str(grille[i][j])) != 2:
-#                     res += " "
-#             if (j, 3) in positions(grille):
-#                 if len(str(grille[i][j])) != 3:
-#                     res += "  "
-#             if (j, 4) in positions(grille):
-#                 if len(str(grille[i][j])) != 4:
-#                     res += "   "
-#             res += str(grille[i][j]) + " "
-#             j += 1
-#         res += '\n'
-#         i += 1
-#     print(res)
-#
-#
-# def positions(g):
-#     pos = []
-#     i = 0
-#     while i < len(g):
-#         j = 0
-#         while j < len(g):
-#             if len(str(g[i][j])) == 2:
-#                 pos.append((j, 2))  # (colonne, nb_caractères)
-#             elif len(str(g[i][j])) == 3:
-#                 pos.append((j, 3))
-#             elif len(str(g[i][j])) == 4:
-#                 pos.append((j, 4))
-#             j += 1
-#         i += 1
-#     return pos
