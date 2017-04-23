@@ -1,4 +1,10 @@
 from random import choice, randrange
+from tkinter import *
+
+n = 6
+
+jeu = Tk()
+jeu.title("Jeu 2048 - version L1 2017")
 
 
 def partie(n):
@@ -7,23 +13,30 @@ def partie(n):
     #       [2, 4, 0, 4],
     #       [4, 0, 2, 2],
     #       [0, 4, 0, 2]]
-    affiche(g3)
-    while not gagnante(g3) and not pleine(g3):
-        d = input("Direction : ")
-        g3 = deplacer(g3, d)
-        val1 = randrange(2, 5, 2)
-        g3 = ajoute_alea(g3, val1)
-        affiche(g3)
+    dessine_grille(g3)
+    # Liaisons touche-fonction
+    jeu.bind('<Up>',
+             lambda event: touche(event, g3))
+    jeu.bind('<Down>',
+             lambda event: touche(event, g3))
+    jeu.bind('<Left>',
+             lambda event: touche(event, g3))
+    jeu.bind('<Right>',
+             lambda event: touche(event, g3))
+
+
+def message(m):
+    label_fin_partie.config(text=m)
 
 
 def deplacer(grille, direction):
-    if direction == "h":
+    if direction == "Up":
         grille = haut(grille)
-    elif direction == "b":
+    elif direction == "Down":
         grille = bas(grille)
-    elif direction == "g":
+    elif direction == "Left":
         grille = gauche(grille)
-    elif direction == "d":
+    elif direction == "Right":
         grille = droite(grille)
     return grille
 
@@ -35,19 +48,42 @@ def cree_grille(n, val):
     return lst
 
 
-def affiche(grille):
-    res = ""
-    for x in grille:
-        for y in x:
-            if y in range(10):
-                res += "   "
-            elif y in range(10, 100):
-                res += "  "
-            elif y in range(100, 1000):
-                res += " "
-            res += str(y) + " "
-        res += '\n'
-    print(res)
+def couleur(n):
+    dico = {2: "#91FFD2", 4: "#B2D8E7", 8: "#B2C4DF", 16: "#6FB8FF",
+            32: "#339ED7", 64: "#50EEEF", 128: "#6893EC", 256: "#0040EC",
+            512: "#6F40E0", 1024: "#7C0C59", 2048: "#C50CD1"}
+    return dico[n]
+
+
+def dessine_grille(g):
+    n = len(g)
+    cote = 70
+    x0, y0 = 50, 50
+    for i in range(n):
+        for j in range(n):
+            x = g[i][j]
+            coords_tuile = (x0 + cote * j,
+                            y0 + cote * i + 1,
+                            x0 + cote * (j + 1),
+                            y0 + cote * (i + 1))
+            if x != 0:
+                if x > 64:
+                    clr_text = "white"
+                else:
+                    clr_text = "black"
+                clr = couleur(x)
+                can.create_rectangle(coords_tuile, fill=clr, width=0)
+                can.create_text(x0 + cote * j + cote / 2,
+                                y0 + cote * i + cote / 2,
+                                text=x, justify=CENTER, fill=clr_text,
+                                font=("Ubuntu", 20, "bold"))
+            else:
+                can.create_rectangle(coords_tuile, fill="white", width=0)
+    for i in range(n + 1):
+        can.create_line(x0 + cote * i, y0, x0 + cote * i, y0 + n * cote,
+                        width=3, fill="gray")
+        can.create_line(x0, y0 + cote * i, x0 + n * cote, y0 + cote * i,
+                        width=3, fill="gray")
 
 
 def appartient(e, g):
@@ -123,7 +159,7 @@ def haut(g):
                     g[x + 1][y] = 0
                     x -= 1
             x += 1
-        # i += 1
+            # i += 1
     return g
 
 
@@ -148,7 +184,7 @@ def bas(g):
                     g[x - 1][y] = 0
                     x += 1
             x -= 1
-        # i -= 1
+            # i -= 1
     return g
 
 
@@ -193,64 +229,46 @@ def droite(g):
     return g
 
 
-g1 = [[2, 2, 2, 2], [4, 0, 2, 8], [0, 16, 32, 0], [128, 256, 1024, 2048]]
-g2 = [[2, 2, 2, 2], [4, 0, 2, 8], [0, 16, 32, 0], [128, 256, 16, 32]]
+# Fonctions Tkinter #
 
-print("Grille g1 :")
-affiche(g1)
-print("appartient(1024, g1) :", appartient(1024, g1))
-print("appartient(512, g1) :", appartient(512, g1))
-print("appartient(0, g1) :", appartient(0, g1))
-print("gagnante(g1) :", gagnante(g1))
-print("pleine(g1) :", pleine(g1))
-print("vides(g1) :", vides(g1))
-
-print("------------------------------------", '\n')
-
-print("Grille g2 :")
-affiche(g2)
-print("valeur_max(g2) :", valeur_max(g2))
-print("lst_cases(g2, 16) :", lst_cases(g2, 16))
-
-print("------------------------------------", '\n')
+def quitter():
+    jeu.quit()
+    jeu.destroy()
 
 
-partie(4)
+def touche(event, g):
+    clef = event.keysym
+    deplacer(g, clef)
+    val1 = randrange(2, 5, 2)
+    g = ajoute_alea(g, val1)
+    dessine_grille(g)
+    if pleine(g) or gagnante(g):
+        jeu.unbind('<Up>')
+        jeu.unbind('<Down>')
+        jeu.unbind('<Left>')
+        jeu.unbind('<Right>')
+        if pleine(g):
+            score = valeur_max(g)
+            msg = "Fin de la partie, vous avez perdu." + " "
+            msg += "Votre score est de " + str(score) + "."
+            message(msg)
+        if gagnante(g):
+            message("Bravo vous avez gagné")
 
-# def afficher(grille):
-#     res = ""
-#     i = 0
-#     while i < len(grille):
-#         j = 0
-#         while j < len(grille):
-#             if (j, 2) in positions(grille):
-#                 if len(str(grille[i][j])) != 2:
-#                     res += " "
-#             if (j, 3) in positions(grille):
-#                 if len(str(grille[i][j])) != 3:
-#                     res += "  "
-#             if (j, 4) in positions(grille):
-#                 if len(str(grille[i][j])) != 4:
-#                     res += "   "
-#             res += str(grille[i][j]) + " "
-#             j += 1
-#         res += '\n'
-#         i += 1
-#     print(res)
-#
-#
-# def positions(g):
-#     pos = []
-#     i = 0
-#     while i < len(g):
-#         j = 0
-#         while j < len(g):
-#             if len(str(g[i][j])) == 2:
-#                 pos.append((j, 2))  # (colonne, nb_caractères)
-#             elif len(str(g[i][j])) == 3:
-#                 pos.append((j, 3))
-#             elif len(str(g[i][j])) == 4:
-#                 pos.append((j, 4))
-#             j += 1
-#         i += 1
-#     return pos
+
+# Widgets Tkinter #
+
+can = Canvas(jeu, height=400, width=400, bg="white")
+can.grid(row= 0, rowspan=3)
+
+bJouer = Button(jeu, text="Jouer", command=lambda: partie(4))
+bJouer.grid(row=0, column=1)
+
+label_fin_partie = Label(jeu)
+label_fin_partie.grid(row=1, column=1)
+
+# Bouton quitter
+bQuitter = Button(jeu, text="Quitter", command=quitter)
+bQuitter.grid(row=2, column=1)
+
+jeu.mainloop()
