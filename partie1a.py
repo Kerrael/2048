@@ -1,3 +1,6 @@
+# Maël QUERRÉ
+# Vincent DE MENEZES
+
 from random import choice, randrange
 
 
@@ -7,8 +10,8 @@ def partie(n):
     while not gagnante(g3) and not pleine(g3):
         d = input("Direction : ")
         g3 = deplacer(g3, d)
-        val1 = randrange(2, 5, 2)
-        g3 = ajoute_alea(g3, val1)
+        val_1 = randrange(2, 5, 2)
+        g3 = ajoute_alea(g3, val_1)
         affiche(g3)
 
 
@@ -62,7 +65,7 @@ def pleine(g):
     return not appartient(0, g)
 
 
-def valeur_max(g):
+def valeur_max(g):  # 'max' est un built-in
     res = 0
     for x in g:
         for y in x:
@@ -71,7 +74,7 @@ def valeur_max(g):
     return res
 
 
-def lst_cases(g, val):
+def les_cases(g, val):
     lst = []
     for i in range(len(g)):
         for j in range(len(g)):
@@ -81,7 +84,7 @@ def lst_cases(g, val):
 
 
 def vides(g):
-    return lst_cases(g, 0)
+    return les_cases(g, 0)
 
 
 def ajoute_alea(g, val):
@@ -92,59 +95,50 @@ def ajoute_alea(g, val):
 
 def init(n):
     grille = cree_grille(n, 0)
-    val1, val2 = randrange(2, 5, 2), randrange(2, 5, 2)
-    grille = ajoute_alea(grille, val1)
-    grille = ajoute_alea(grille, val2)
+    val_1, val_2 = randrange(2, 5, 2), randrange(2, 5, 2)
+    grille = ajoute_alea(grille, val_1)
+    grille = ajoute_alea(grille, val_2)
     return grille
-
 
 def haut(g):
     n = len(g)
-    i = 0
     for j in range(n):  # on parcourt les colonnes
-        x, y = i, j
-        while x < n - 1:  # fusions
-            if g[x + 1][y] == g[x][y]:  # si deux éléments identiques
-                g[x][y] *= 2  # alors on les fusionne
-                g[x + 1][y] = 0
-            x += 1
-    # i = 0
-    # while i < n - 1:
-    for j in range(n):
-        x, y = i, j
-        while x < n - 1:
-            if g[x][y] == 0 and g[x + 1][y] != 0:
+        i = 0
+        while i < n - 1:  # on effectue les fusions
+            if g[i][j] != 0 and g[i + 1][j] == g[i][j]:
+                g[i][j] *= 2
+                g[i + 1][j] = 0
+            i += 1
+        i = 0
+        while i < n - 1:  # déplacements une fois les fusions effectuées
+            if g[i][j] == 0 and g[i + 1][j] != 0:
+                x, y = i, j
                 while x >= 0 and g[x][y] == 0:
                     g[x][y] = g[x + 1][y]
                     g[x + 1][y] = 0
                     x -= 1
-            x += 1
-        # i += 1
+            i += 1
     return g
 
 
 def bas(g):
     n = len(g)
-    i = n - 1
-    for j in range(n):  # on parcourt les colonnes
-        x, y = i, j
-        while x > 0:  # fusions
-            if g[x - 1][y] == g[x][y]:  # si deux éléments identiques
-                g[x][y] *= 2  # alors on les fusionne
-                g[x - 1][y] = 0
-            x -= 1
-    # i = n - 1
-    # while i > 0:
     for j in range(n):
-        x, y = i, j
-        while x > 0:
-            if g[x][y] == 0 and g[x - 1][y] != 0:
+        i = n - 1
+        while i > 0:  # fusions
+            if g[i][j] != 0 and g[i - 1][j] == g[i][j]:
+                g[i][j] *= 2
+                g[i - 1][j] = 0
+            i -= 1
+        i = n - 1
+        while i > 0:  # déplacements une fois les fusions effectuées
+            if g[i][j] == 0 and g[i - 1][j] != 0:
+                x, y = i, j
                 while x < n and g[x][y] == 0:
                     g[x][y] = g[x - 1][y]
                     g[x - 1][y] = 0
                     x += 1
-            x -= 1
-        # i -= 1
+            i -= 1
     return g
 
 
@@ -154,11 +148,11 @@ def gauche(g):
         j = 0
         x, y = i, j
         while y < n - 1:  # fusions
-            if g[x][y + 1] == g[x][y]:  # si deux éléments identiques
-                g[x][y] *= 2  # alors on les fusionne
+            if g[x][y] != 0 and g[x][y + 1] == g[x][y]:
+                g[x][y] *= 2
                 g[x][y + 1] = 0
             y += 1
-        while j < n - 1:  # déplacements
+        while j < n - 1:  # déplacements une fois les fusions effectuées
             if g[i][j] == 0 and g[i][j + 1] != 0:
                 while j >= 0 and g[i][j] == 0:
                     g[i][j] = g[i][j + 1]
@@ -174,12 +168,11 @@ def droite(g):
         j = n - 1
         x, y = i, j
         while y > 0:  # fusions
-            if g[x][y - 1] == g[x][y]:
-                # si case précédente identique à case actuelle
+            if g[x][y] != 0 and g[x][y - 1] == g[x][y]:
                 g[x][y] *= 2
                 g[x][y - 1] = 0
             y -= 1
-        while j > 0:  # déplacements une fois les fusions faites
+        while j > 0:  # déplacements une fois les fusions effectuées
             if g[i][j] == 0 and g[i][j - 1] != 0:
                 while j < n and g[i][j] == 0:
                     g[i][j] = g[i][j - 1]
@@ -187,3 +180,5 @@ def droite(g):
                     j += 1
             j -= 1
     return g
+
+partie(6)
